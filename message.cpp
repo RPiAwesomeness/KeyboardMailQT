@@ -19,10 +19,10 @@ MimeMessage Message::createMessage() {
     message.addRecipient(recipients[i]);
   }
 
-  MimeText contents;
-  contents.setText(this->&contents);
+  MimeText mimeText;
+  mimeText.setText(&this->contents);
 
-  message.addPart(&contents);
+  message.addPart(&mimeText);
 
   return message;
 }
@@ -32,7 +32,7 @@ MimeMessage Message::createMessage(QString subject, QString text, QList<QString>
 
   message.setSender(this->sender);
   message.setSubject(subject);
-  for (i = 0; i < sizeof(recipients); i++) {
+  for (u_int i = 0; i < sizeof(recipients); i++) {
     message.addRecipient(recipients[i]);
   }
 
@@ -46,12 +46,12 @@ MimeMessage Message::createMessage(QString subject, QString text, QList<QString>
 
 bool Message::sendMessage() const {
   // The SMTP client hasn't been configured/message hasn't been created, don't continue
-  if (!this->clientConfigured || !this->message) {
+  if (!clientConfigured() || !message) {
     return false;
   }
 
   // Chain the different client functions with short-circuit logic
-  if (client->connectToHost() && client->login() && client->sendMail(this->message)) {
+  if (client->connectToHost() && client->login() && client->sendMail(message)) {
     client->quit();
     return true;
   } else {
@@ -63,7 +63,7 @@ bool Message::sendMessage() const {
 bool Message::sendMessage(MimeMessage &message) const {
 
   // The SMTP client hasn't been configured, don't continue
-  if (!this->clientConfigured) {
+  if (!clientConfigured()) {
     return false;
   }
 
@@ -83,7 +83,7 @@ bool Message::clientConfigured() const {
 
 bool Message::setupSmtp(QString path, int port, SmtpClient::ConnectionType connType) {
   SmtpClient client(path, port, connType);
-  client = &client;
+  this->client = &client;
   return true;
 }
 
