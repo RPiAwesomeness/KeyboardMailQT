@@ -12,3 +12,18 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_pushButton_released()
+{
+  // Grab the message contents
+  ui->textEdit->toPlainText();
+  // Grab the recipient email
+  ui->lineEdit->text();
+  // Send both to email creation function
+  // Profit!
+}
+
+void MainWindow::on_actionQuit_triggered()
+{
+  QApplication::quit();
+}
