@@ -5,6 +5,11 @@
 #include <QList>
 #include <smtp/src/SmtpMime>
 
+struct MessageDetails {
+  QString contents;
+  QList<QString> recipient;
+};
+
 class Message {
 public:
   Message(QString displayName, QString email, QString username, QString password);
@@ -13,8 +18,8 @@ public:
   MimeMessage* createMessage();
   MimeMessage* createMessage(QString subject, QString contents, QList<EmailAddress*> recipients);
 
-  bool sendMessage(MimeMessage &message) const;
-  bool sendMessage() const;
+  bool sendMessage(MimeMessage &message);
+  bool sendMessage();
   bool clientConfigured() const;
   bool setupSmtp(QString path, int port, SmtpClient::ConnectionType connType);
 
@@ -32,11 +37,12 @@ private:
   QString displayName, username, password;
   QString contents, subject;
 
-  bool configured;
+  bool configured = false;
+  bool messageIsPrepared = false;
 
   EmailAddress *sender = nullptr;
   SmtpClient *client = nullptr;
-  MimeMessage *message = nullptr;
+  MimeMessage message;
 
   QList<EmailAddress*> recipients;
 };
