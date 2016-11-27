@@ -10,9 +10,8 @@ public:
   Message(QString displayName, QString email, QString username, QString password);
   ~Message();
 
-
-  MimeMessage createMessage();
-  MimeMessage createMessage(QString subject, QString contents, QList<QString> recipients);
+  MimeMessage* createMessage();
+  MimeMessage* createMessage(QString subject, QString contents, QList<EmailAddress*> recipients);
 
   bool sendMessage(MimeMessage &message) const;
   bool sendMessage() const;
@@ -20,13 +19,14 @@ public:
   bool setupSmtp(QString path, int port, SmtpClient::ConnectionType connType);
 
   void setContents(QString contents), setSubject(QString subject);
-  void setRecipients(QList<QString> recipients);
+  void addRecipient(EmailAddress* recipient);
+  void setRecipients(QList<EmailAddress*> recipients);
   void setAuth(QString username, QString password);
 
   QString getContents() const;
   QString getSubject() const;
 
-  QList<QString> getRecipients() const;
+  QList<EmailAddress*> getRecipients() const;
 
 private:
   QString displayName, username, password;
@@ -38,7 +38,7 @@ private:
   SmtpClient *client = nullptr;
   MimeMessage *message = nullptr;
 
-  QList<QString> recipients;
+  QList<EmailAddress*> recipients;
 };
 
 #endif // MESSAGE_HPP

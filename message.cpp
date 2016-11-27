@@ -10,24 +10,24 @@ Message::Message(QString displayName, QString email, QString username, QString p
 }
 
 // Create the message with the data within the Message object
-MimeMessage Message::createMessage() {
+MimeMessage* Message::createMessage() {
   MimeMessage message;
 
-  message.setSender(sender);
+  message.setSender(this->sender);
   message.setSubject(this->subject);
-  for (u_int i = 0; i < sizeof(recipients); i++) {
-    message.addRecipient(recipients[i]);
+  for (u_int i = 0; i < sizeof(this->recipients); i++) {
+    message.addRecipient(this->recipients[i]);
   }
 
   MimeText mimeText;
-  mimeText.setText(&this->contents);
+  mimeText.setText(this->contents);
 
   message.addPart(&mimeText);
 
-  return message;
+  return &message;
 }
 
-MimeMessage Message::createMessage(QString subject, QString text, QList<QString> recipients) {
+MimeMessage* Message::createMessage(QString subject, QString text, QList<EmailAddress*> recipients) {
   MimeMessage message;
 
   message.setSender(this->sender);
@@ -41,23 +41,23 @@ MimeMessage Message::createMessage(QString subject, QString text, QList<QString>
 
   message.addPart(&contents);
 
-  return message;
+  return &message;
 }
 
 bool Message::sendMessage() const {
   // The SMTP client hasn't been configured/message hasn't been created, don't continue
-  if (!clientConfigured() || !message) {
+  if (!this->clientConfigured() || !this->message) {
     return false;
   }
 
   // Chain the different client functions with short-circuit logic
-  if (client->connectToHost() && client->login() && client->sendMail(message)) {
+  if (client->connectToHost() && client->login() && client->sendMail(toSend)) {
     client->quit();
     return true;
-  } else {
-    client->quit();
-    return false;
   }
+
+  client->quit();
+  return false;
 }
 
 bool Message::sendMessage(MimeMessage &message) const {
@@ -95,8 +95,12 @@ void Message::setSubject(QString subject) {
   this->subject = subject;
 }
 
-void Message::setRecipients(QList<QString> recipients) {
+void Message::setRecipients(QList<EmailAddress*> recipients) {
   this->recipients = recipients;
+}
+
+void Message::addRecipient(EmailAddress* recipient) {
+  this->recipients.append(recipient);
 }
 
 void Message::setAuth(QString username, QString password) {
@@ -112,6 +116,6 @@ QString Message::getSubject() const {
   return this->subject;
 }
 
-QList<QString> Message::getRecipients() const {
+QList<EmailAddress*> Message::getRecipients() const {
   return this->recipients;
 }
