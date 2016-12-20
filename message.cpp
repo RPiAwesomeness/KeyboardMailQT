@@ -101,7 +101,7 @@ void Message::setRecipients(QList<EmailAddress*> recipients) {
   recipients = recipients;
 }
 
-void Message::addRecipient(EmailAddress* recipient) {
+void Message::addRecipient(EmailAddress& recipient) {
   recipients.append(recipient);
 }
 
