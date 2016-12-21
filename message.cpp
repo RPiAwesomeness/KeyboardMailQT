@@ -7,62 +7,33 @@ Message::Message(QString displayName, QString email, QString username, QString p
   sender = new EmailAddress(email, displayName);
   username = username;
   password = password;
+
+  MimeMessage message;
 }
 
-// Create the message with the data within the Message object
-MimeMessage* Message::createMessage() {
-  MimeMessage* message = new MimeMessage;
-
-  message->setSender(sender);
-  message->setSubject(subject);
-  for (u_int i = 0; i < sizeof(recipients); i++) {
-    message->addRecipient(recipients[i]);
-  }
-
-  MimeText mimeText;
-  mimeText.setText(contents);
-
-  message->addPart(&mimeText);
-
-  messageIsPrepared = true;
-
-  return message;
+Message::~Message() {
+  qDeleteAll(recipients);
 }
 
-MimeMessage* Message::createMessage(QString subject, QString text, QList<EmailAddress*> recipients) {
-  MimeMessage* message = new MimeMessage;
-
-  message->setSender(sender);
-  message->setSubject(subject);
-  for (u_int i = 0; i < sizeof(recipients); i++) {
-    message->addRecipient(recipients[i]);
+void Message::createMessage(QString subject, QString text, QList<EmailAddress*> recipients) {
+  message.setSender(sender);
+  message.setSubject(subject);
+  qInfo() << recipients;
+  for (int i = 0; i < recipients.count(); i++) {
+    message.addRecipient(recipients[i]);
   }
 
   MimeText contents;
   contents.setText(text);
 
-  message->addPart(&contents);
+  message.addPart(&contents);
 
-  return message;
+  configured = true;
 }
 
 bool Message::sendMessage() {
-  // The SMTP client hasn't been configured/message hasn't been created, don't continue
-  if (!clientConfigured() || !messageIsPrepared) {
-    return false;
-  }
 
-  // Chain the different client functions with short-circuit logic
-  if (client->connectToHost() && client->login() && client->sendMail(message)) {
-    client->quit();
-    return true;
-  }
-
-  client->quit();
-  return false;
-}
-
-bool Message::sendMessage(MimeMessage &message) {
+  qInfo() << clientConfigured();
 
   // The SMTP client hasn't been configured, don't continue
   if (!clientConfigured()) {
@@ -101,13 +72,13 @@ void Message::setRecipients(QList<EmailAddress*> recipients) {
   recipients = recipients;
 }
 
-void Message::addRecipient(EmailAddress& recipient) {
+void Message::addRecipient(EmailAddress* recipient) {
   recipients.append(recipient);
 }
 
-void Message::setAuth(QString username, QString password) {
-  username = username;
-  password = password;
+void Message::setAuth() {
+  client->setUser(username);
+  client->setPassword(password);
 }
 
 QString Message::getContents() const {

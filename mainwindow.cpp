@@ -22,19 +22,20 @@ void MainWindow::on_pushButton_released()
   QString msgContents = ui->textEdit->toPlainText();
   // Grab the recipient email
   QString recipients = ui->lineEdit->text();
-  qInfo() << "Contents:" << msgContents;
-  qInfo() << "Recipients:" << recipients;
   // Generate the message from this
   Message message("KeyboardMailQt", "keyboardmailtesting@gmail.com", "keyboardmailtesting@gmail.com", "k3yb0ardMa!l");
+  message.setupSmtp("smtp.gmail.com", 465, SmtpClient::SslConnection);
+  message.setAuth();
 
-  EmailAddress recipient("keyboardmailtesting@gmail.com");
-
+  EmailAddress *recipient = new EmailAddress(recipients);
   message.addRecipient(recipient);
 
-  message.setSubject("Foo bar test");
-  message.setContents(msgContents);
+  message.createMessage("foo bar test", msgContents, message.getRecipients());
 
-  message.sendMessage();
+  qDebug() << "Configured:" << message.clientConfigured();
+
+  bool success = message.sendMessage();
+  qDebug() << "Success:" << success;
   // Profit!
 }
 
