@@ -5,40 +5,44 @@
 #include <QList>
 #include <smtp/src/SmtpMime>
 
+struct MessageDetails {
+  QString contents;
+  QList<QString> recipient;
+};
+
 class Message {
 public:
   Message(QString displayName, QString email, QString username, QString password);
   ~Message();
 
+  void createMessage(QString subject, QString contents, QList<EmailAddress*> recipients);
 
-  MimeMessage createMessage();
-  MimeMessage createMessage(QString subject, QString contents, QList<QString> recipients);
-
-  bool sendMessage(MimeMessage &message) const;
-  bool sendMessage() const;
+  bool sendMessage();
   bool clientConfigured() const;
   bool setupSmtp(QString path, int port, SmtpClient::ConnectionType connType);
 
   void setContents(QString contents), setSubject(QString subject);
-  void setRecipients(QList<QString> recipients);
-  void setAuth(QString username, QString password);
+  void addRecipient(EmailAddress* recipient);
+  void setRecipients(QList<EmailAddress*> recipients);
+  void setAuth();
 
   QString getContents() const;
   QString getSubject() const;
 
-  QList<QString> getRecipients() const;
+  QList<EmailAddress*> getRecipients() const;
 
 private:
   QString displayName, username, password;
   QString contents, subject;
 
-  bool configured;
+  bool configured = false;
+  bool messageIsPrepared = false;
 
   EmailAddress *sender = nullptr;
   SmtpClient *client = nullptr;
-  MimeMessage *message = nullptr;
+  MimeMessage message;
 
-  QList<QString> recipients;
+  QList<EmailAddress*> recipients;
 };
 
 #endif // MESSAGE_HPP

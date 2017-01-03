@@ -1,5 +1,8 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
+#include "message.hpp"
+#include <QString>
+#include "smtp/src/SmtpMime"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,10 +19,23 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_released()
 {
   // Grab the message contents
-  ui->textEdit->toPlainText();
+  QString msgContents = ui->textEdit->toPlainText();
   // Grab the recipient email
-  ui->lineEdit->text();
-  // Send both to email creation function
+  QString recipients = ui->lineEdit->text();
+  // Generate the message from this
+  Message message("KeyboardMailQt", "keyboardmailtesting@gmail.com", "keyboardmailtesting@gmail.com", "k3yb0ardMa!l");
+  message.setupSmtp("smtp.gmail.com", 465, SmtpClient::SslConnection);
+  message.setAuth();
+
+  EmailAddress *recipient = new EmailAddress(recipients);
+  message.addRecipient(recipient);
+
+  message.createMessage("foo bar test", msgContents, message.getRecipients());
+
+  qDebug() << "Configured:" << message.clientConfigured();
+
+  bool success = message.sendMessage();
+  qDebug() << "Success:" << success;
   // Profit!
 }
 

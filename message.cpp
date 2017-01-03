@@ -7,32 +7,19 @@ Message::Message(QString displayName, QString email, QString username, QString p
   sender = new EmailAddress(email, displayName);
   username = username;
   password = password;
+
+  MimeMessage message;
 }
 
-// Create the message with the data within the Message object
-MimeMessage Message::createMessage() {
-  MimeMessage message;
+Message::~Message() {
+  qDeleteAll(recipients);
+}
 
+void Message::createMessage(QString subject, QString text, QList<EmailAddress*> recipients) {
   message.setSender(sender);
-  message.setSubject(this->subject);
-  for (u_int i = 0; i < sizeof(recipients); i++) {
-    message.addRecipient(recipients[i]);
-  }
-
-  MimeText mimeText;
-  mimeText.setText(&this->contents);
-
-  message.addPart(&mimeText);
-
-  return message;
-}
-
-MimeMessage Message::createMessage(QString subject, QString text, QList<QString> recipients) {
-  MimeMessage message;
-
-  message.setSender(this->sender);
   message.setSubject(subject);
-  for (u_int i = 0; i < sizeof(recipients); i++) {
+  qInfo() << recipients;
+  for (int i = 0; i < recipients.count(); i++) {
     message.addRecipient(recipients[i]);
   }
 
@@ -41,26 +28,12 @@ MimeMessage Message::createMessage(QString subject, QString text, QList<QString>
 
   message.addPart(&contents);
 
-  return message;
+  configured = true;
 }
 
-bool Message::sendMessage() const {
-  // The SMTP client hasn't been configured/message hasn't been created, don't continue
-  if (!clientConfigured() || !message) {
-    return false;
-  }
+bool Message::sendMessage() {
 
-  // Chain the different client functions with short-circuit logic
-  if (client->connectToHost() && client->login() && client->sendMail(message)) {
-    client->quit();
-    return true;
-  } else {
-    client->quit();
-    return false;
-  }
-}
-
-bool Message::sendMessage(MimeMessage &message) const {
+  qInfo() << clientConfigured();
 
   // The SMTP client hasn't been configured, don't continue
   if (!clientConfigured()) {
@@ -88,30 +61,34 @@ bool Message::setupSmtp(QString path, int port, SmtpClient::ConnectionType connT
 }
 
 void Message::setContents(QString contents) {
-  this->contents = contents;
+  contents = contents;
 }
 
 void Message::setSubject(QString subject) {
-  this->subject = subject;
+  subject = subject;
 }
 
-void Message::setRecipients(QList<QString> recipients) {
-  this->recipients = recipients;
+void Message::setRecipients(QList<EmailAddress*> recipients) {
+  recipients = recipients;
 }
 
-void Message::setAuth(QString username, QString password) {
-  this->username = username;
-  this->password = password;
+void Message::addRecipient(EmailAddress* recipient) {
+  recipients.append(recipient);
+}
+
+void Message::setAuth() {
+  client->setUser(username);
+  client->setPassword(password);
 }
 
 QString Message::getContents() const {
-  return this->contents;
+  return contents;
 }
 
 QString Message::getSubject() const {
-  return this->subject;
+  return subject;
 }
 
-QList<QString> Message::getRecipients() const {
-  return this->recipients;
+QList<EmailAddress*> Message::getRecipients() const {
+  return recipients;
 }
