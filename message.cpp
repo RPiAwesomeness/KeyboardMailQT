@@ -3,10 +3,10 @@
 #include <smtp/src/SmtpMime>
 #include <vector>
 
-Message::Message(QString displayName, QString email, QString username, QString password) {
-  sender = new EmailAddress(email, displayName);
-  username = username;
-  password = password;
+Message::Message(QString mDisplayName, QString mEmail, QString mUsername, QString mPassword) {
+  sender = new EmailAddress(mEmail, mDisplayName);
+  username = mUsername;
+  password = mPassword;
 
   MimeMessage message;
 }
@@ -57,6 +57,9 @@ bool Message::clientConfigured() const {
 bool Message::setupSmtp(QString path, int port, SmtpClient::ConnectionType connType) {
   SmtpClient client(path, port, connType);
   this->client = &client;
+
+  qInfo() << password;
+
   return true;
 }
 
@@ -77,6 +80,7 @@ void Message::addRecipient(EmailAddress* recipient) {
 }
 
 void Message::setAuth() {
+  qInfo() << username << password;
   client->setUser(username);
   client->setPassword(password);
 }

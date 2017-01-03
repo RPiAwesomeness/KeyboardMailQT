@@ -12,7 +12,7 @@ struct MessageDetails {
 
 class Message {
 public:
-  Message(QString displayName, QString email, QString username, QString password);
+  Message(QString mDisplayName, QString mEmail, QString mUsername, QString mPassword);
   ~Message();
 
   void createMessage(QString subject, QString contents, QList<EmailAddress*> recipients);
