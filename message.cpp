@@ -13,12 +13,17 @@ Message::Message(QString mDisplayName, QString mEmail, QString mUsername, QStrin
 
 Message::~Message() {
   qDeleteAll(recipients);
+  if (sender) {
+    delete sender;
+  }
+  if (client) {
+    delete client;
+  }
 }
 
 void Message::createMessage(QString subject, QString text, QList<EmailAddress*> recipients) {
   message.setSender(sender);
   message.setSubject(subject);
-  qInfo() << recipients;
   for (int i = 0; i < recipients.count(); i++) {
     message.addRecipient(recipients[i]);
   }
@@ -56,9 +61,6 @@ bool Message::clientConfigured() const {
 
 bool Message::setupSmtp(QString path, int port, SmtpClient::ConnectionType connType) {
   SmtpClient client(path, port, connType);
-  this->client = &client;
-
-  qInfo() << password;
 
   return true;
 }
