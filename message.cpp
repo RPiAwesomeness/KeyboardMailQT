@@ -13,6 +13,7 @@ Message::Message(QString mDisplayName, QString mEmail, QString mUsername, QStrin
 
 Message::~Message() {
   qDeleteAll(recipients);
+
   if (sender) {
     delete sender;
   }
@@ -46,7 +47,12 @@ bool Message::sendMessage() {
   }
 
   // Chain the different client functions with short-circuit logic
-  if (client->connectToHost() && client->login() && client->sendMail(message)) {
+  if (client->connectToHost() && client->login()) {
+    try {
+      client->sendMail(message);
+    } catch (...) {
+      qInfo() << "stuff went down";
+    }
     client->quit();
     return true;
   } else {
@@ -61,6 +67,7 @@ bool Message::clientConfigured() const {
 
 bool Message::setupSmtp(QString path, int port, SmtpClient::ConnectionType connType) {
   SmtpClient client(path, port, connType);
+  this->client = &client;
 
   return true;
 }
