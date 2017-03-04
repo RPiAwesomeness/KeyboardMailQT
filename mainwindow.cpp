@@ -23,19 +23,44 @@ void MainWindow::on_pushButton_released()
   // Grab the recipient email
   QString recipients = ui->lineEdit->text();
   // Generate the message from this
-  Message message("KeyboardMailQt", "keyboardmailtesting@gmail.com", "keyboardmailtesting@gmail.com", "k3yb0ardMa!l");
-  message.setupSmtp("smtp.gmail.com", 465, SmtpClient::SslConnection);
-  message.setAuth();
+  SmtpClient smtp("smtp.gmail.com", 465, SmtpClient::SslConnection);
 
-  EmailAddress *recipient = new EmailAddress(recipients);
-  message.addRecipient(recipient);
+  smtp.setUser("keyboardmailtesting@gmail.com");
+  smtp.setPassword("k3yb0ardMa!l");
 
-  message.createMessage("foo bar test", msgContents, message.getRecipients());
+  MimeMessage message;
 
-  qDebug() << "Configured:" << message.clientConfigured();
+  message.addRecipient(new EmailAddress("keyboardmailtesting@gmail.com", "foo"));
+  message.setSender(new EmailAddress("keyboardmailtesting@gmail.com", "test"));
+  message.setSubject("KeyboardMailTesting test");
 
-  bool success = message.sendMessage();
-  qDebug() << "Success:" << success;
+  MimeText text;
+  text.setText("Hi!");
+
+  message.addPart(&text);
+
+  smtp.connectToHost();
+  smtp.login();
+  bool success = smtp.sendMail(message);
+  bool qSuccess = smtp.quit();
+
+  qInfo() << success << qSuccess;
+
+//  Message message("KeyboardMailQt", "keyboardmailtesting@gmail.com", "keyboardmailtesting@gmail.com", "k3yb0ardMa!l");
+//  message.setupSmtp("smtp.gmail.com", 465, SmtpClient::SslConnection);
+//  message.setAuth();
+
+//  EmailAddress *recipient = new EmailAddress(recipients, "test");
+//  message.addRecipient(recipient);
+
+//  QString foo = "foo bar test";
+
+//  message.createMessage(foo, msgContents, message.getRecipients());
+
+//  qDebug() << "Configured:" << message.clientConfigured();
+
+//  bool success = message.sendMessage();
+//  qDebug() << "Success:" << success;
   // Profit!
 }
 

@@ -66,8 +66,7 @@ bool Message::clientConfigured() const {
 }
 
 bool Message::setupSmtp(QString path, int port, SmtpClient::ConnectionType connType) {
-  SmtpClient client(path, port, connType);
-  this->client = &client;
+  this->client = new SmtpClient(path, port, connType);
 
   return true;
 }
