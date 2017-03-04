@@ -42,9 +42,9 @@ void MainWindow::on_pushButton_released()
   smtp.connectToHost();
   smtp.login();
   bool success = smtp.sendMail(message);
-  bool qSuccess = smtp.quit();
+  smtp.quit();
 
-  qInfo() << success << qSuccess;
+  qInfo() << success;
 
 //  Message message("KeyboardMailQt", "keyboardmailtesting@gmail.com", "keyboardmailtesting@gmail.com", "k3yb0ardMa!l");
 //  message.setupSmtp("smtp.gmail.com", 465, SmtpClient::SslConnection);

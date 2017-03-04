@@ -93,8 +93,8 @@ void Message::setAuth() {
   client->setPassword(password);
 }
 
-QString Message::getContents() const {
-  return contents;
+MimeText* Message::getContents() {
+  return &contents;
 }
 
 QString Message::getSubject() const {

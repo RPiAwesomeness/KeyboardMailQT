@@ -26,14 +26,15 @@ public:
   void setRecipients(QList<EmailAddress*> recipients);
   void setAuth();
 
-  QString getContents() const;
+  MimeText* getContents();
   QString getSubject() const;
 
   QList<EmailAddress*> getRecipients() const;
 
 private:
   QString displayName, username, password;
-  QString contents, subject;
+  QString subject;
+  MimeText contents;
 
   bool configured = false;
   bool messageIsPrepared = false;
