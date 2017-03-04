@@ -17,8 +17,10 @@ public:
 
 private slots:
   void on_pushButton_released();
-
   void on_actionQuit_triggered();
+
+  void loadSettings();
+  void saveSettings();
 
 private:
     Ui::MainWindow *ui;

@@ -2,18 +2,34 @@
 #include "ui_mainwindow.h"
 #include "message.hpp"
 #include <QString>
+#include <QSettings>
 #include "smtp/src/SmtpMime"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+  loadSettings();
+  ui->setupUi(this);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::loadSettings() {
+  QSettings settings;
+  QString acctUsername = settings.value("acctUsername", "").toString();
+  QString acctPassword = settings.value("acctPasswod", "").toString();
+
+  qInfo() << acctUsername << acctPassword;
+}
+
+void MainWindow::saveSettings() {
+  QSettings settings;
+
+  settings.setValue("acctUsername", "foobar");
 }
 
 void MainWindow::on_pushButton_released()
