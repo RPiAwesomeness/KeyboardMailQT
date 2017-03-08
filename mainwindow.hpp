@@ -2,6 +2,7 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
+#include <QSettings>
 
 namespace Ui {
 class MainWindow;
@@ -24,6 +25,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QString acctUsername, acctPassword, displayName;
+    QSettings settings;
 };
 
 #endif // MAINWINDOW_HPP

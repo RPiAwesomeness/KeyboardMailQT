@@ -3,12 +3,17 @@
 #include <smtp/src/SmtpMime>
 #include <vector>
 
-Message::Message(QString mDisplayName, QString mEmail, QString mUsername, QString mPassword) {
-  sender = new EmailAddress(mEmail, mDisplayName);
-  username = mUsername;
-  password = mPassword;
-
+Message::Message(QString displayName, QString email, QString uname, QString pass)
+  : sender(new EmailAddress(email, displayName)),
+    username(uname),
+    password(pass)
+{
   MimeMessage message;
+  message.setSender(sender);
+
+  SmtpClient client("smtp.gmail.com", 465, SmtpClient::SslConnection);
+  client.setUser(username);
+  client.setPassword(password);
 }
 
 Message::~Message() {
@@ -23,7 +28,6 @@ Message::~Message() {
 }
 
 void Message::createMessage(QString subject, QString text, QList<EmailAddress*> recipients) {
-  message.setSender(sender);
   message.setSubject(subject);
   for (int i = 0; i < recipients.count(); i++) {
     message.addRecipient(recipients[i]);
@@ -33,8 +37,6 @@ void Message::createMessage(QString subject, QString text, QList<EmailAddress*> 
   contents.setText(text);
 
   message.addPart(&contents);
-
-  configured = true;
 }
 
 bool Message::sendMessage() {
@@ -62,13 +64,7 @@ bool Message::sendMessage() {
 }
 
 bool Message::clientConfigured() const {
-  return configured;
-}
-
-bool Message::setupSmtp(QString path, int port, SmtpClient::ConnectionType connType) {
-  this->client = new SmtpClient(path, port, connType);
-
-  return true;
+  qInfo() << client.
 }
 
 void Message::setContents(QString contents) {

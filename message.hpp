@@ -12,19 +12,17 @@ struct MessageDetails {
 
 class Message {
 public:
-  Message(QString mDisplayName, QString mEmail, QString mUsername, QString mPassword);
+  Message(QString displayName, QString email, QString uname, QString pass);
   ~Message();
 
   void createMessage(QString subject, QString contents, QList<EmailAddress*> recipients);
 
   bool sendMessage();
   bool clientConfigured() const;
-  bool setupSmtp(QString path, int port, SmtpClient::ConnectionType connType);
 
   void setContents(QString contents), setSubject(QString subject);
   void addRecipient(EmailAddress* recipient);
   void setRecipients(QList<EmailAddress*> recipients);
-  void setAuth();
 
   MimeText* getContents();
   QString getSubject() const;
@@ -36,11 +34,10 @@ private:
   QString subject;
   MimeText contents;
 
-  bool configured = false;
   bool messageIsPrepared = false;
 
   EmailAddress *sender = nullptr;
-  SmtpClient *client = nullptr;
+  SmtpClient client;
   MimeMessage message;
 
   QList<EmailAddress*> recipients;
