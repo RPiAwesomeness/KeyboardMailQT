@@ -22,21 +22,42 @@ Message::~Message() {
   if (sender) {
     delete sender;
   }
-  if (client) {
-    delete client;
-  }
 }
 
-void Message::createMessage(QString subject, QString text, QList<EmailAddress*> recipients) {
+void Message::createMessage(QString subject, const QString &text, QList<EmailAddress*> recipients) {
   message.setSubject(subject);
-  for (int i = 0; i < recipients.count(); i++) {
-    message.addRecipient(recipients[i]);
+
+  foreach (EmailAddress* recipient, recipients) {
+    message.addRecipient(recipient);
   }
 
   MimeText contents;
   contents.setText(text);
 
   message.addPart(&contents);
+}
+
+
+void Message::createMessage(QString subject, const QString &text) {
+  message.setSubject(subject);
+
+  MimeText contents;
+  contents.setText(text);
+
+  message.addPart(&contents);
+}
+
+void Message::createMessage(QString subject, const QString &text, QString recipients) {
+  message.setSubject(subject);
+
+  MimeText contents;
+  contents.setText(text);
+
+  message.addPart(&contents);
+
+  foreach (QString recipient, recipients.split(',')) {
+   message.addRecipient(new EmailAddress(recipient, "foo"));
+  }
 }
 
 bool Message::sendMessage() {
@@ -49,22 +70,23 @@ bool Message::sendMessage() {
   }
 
   // Chain the different client functions with short-circuit logic
-  if (client->connectToHost() && client->login()) {
+  if (client.connectToHost() && client.login()) {
     try {
-      client->sendMail(message);
+      client.sendMail(message);
     } catch (...) {
       qInfo() << "stuff went down";
     }
-    client->quit();
+    client.quit();
     return true;
   } else {
-    client->quit();
+    client.quit();
     return false;
   }
 }
 
 bool Message::clientConfigured() const {
-  qInfo() << client.
+//  qInfo() << client.
+  return true;
 }
 
 void Message::setContents(QString contents) {
@@ -79,14 +101,15 @@ void Message::setRecipients(QList<EmailAddress*> recipients) {
   recipients = recipients;
 }
 
-void Message::addRecipient(EmailAddress* recipient) {
-  recipients.append(recipient);
+void Message::setRecipients(QString recipients) {
+  QStringList peeps = recipients.split(',');
+  foreach (QString foo, peeps) {
+    this->recipients.append(new EmailAddress(foo, "foo"));
+  }
 }
 
-void Message::setAuth() {
-  qInfo() << username << password;
-  client->setUser(username);
-  client->setPassword(password);
+void Message::addRecipient(EmailAddress* recipient) {
+  recipients.append(recipient);
 }
 
 MimeText* Message::getContents() {

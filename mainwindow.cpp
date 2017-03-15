@@ -42,26 +42,10 @@ void MainWindow::on_pushButton_released()
   // Grab the recipient email
   QString recipients = ui->lineEdit->text();
   // Generate the message from this
-  SmtpClient smtp("smtp.gmail.com", 465, SmtpClient::SslConnection);
-
-  smtp.setUser(acctUsername);
-  smtp.setPassword(acctPassword);
-
-  MimeMessage message;
-
-  message.addRecipient(new EmailAddress("keyboardmailtesting@gmail.com", "foo"));
-  message.setSender(new EmailAddress(acctUsername, "test"));
-  message.setSubject("KeyboardMailTesting test");
-
-  MimeText text;
-  text.setText("Hi!");
-
-  message.addPart(&text);
-
-  smtp.connectToHost();
-  smtp.login();
-  smtp.sendMail(message);
-  smtp.quit();
+  Message message(displayName, acctUsername, acctUsername, acctPassword);
+  message.setRecipients(recipients);
+  message.createMessage("KeyboardMail testing", msgContents, recipients);
+  message.sendMessage();
 }
 
 void MainWindow::on_actionQuit_triggered()

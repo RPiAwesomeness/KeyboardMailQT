@@ -15,7 +15,9 @@ public:
   Message(QString displayName, QString email, QString uname, QString pass);
   ~Message();
 
-  void createMessage(QString subject, QString contents, QList<EmailAddress*> recipients);
+  void createMessage(QString subject, const QString &contents, QList<EmailAddress*> recipients);
+  void createMessage(QString subject, const QString &contents);
+  void createMessage(QString subject, const QString &contents, QString recipients);
 
   bool sendMessage();
   bool clientConfigured() const;
@@ -23,6 +25,7 @@ public:
   void setContents(QString contents), setSubject(QString subject);
   void addRecipient(EmailAddress* recipient);
   void setRecipients(QList<EmailAddress*> recipients);
+  void setRecipients(QString recipients);
 
   MimeText* getContents();
   QString getSubject() const;
